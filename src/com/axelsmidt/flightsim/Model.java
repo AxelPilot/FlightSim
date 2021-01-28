@@ -1,13 +1,16 @@
-package com.axelsmidt.flightsim.model;
+package com.axelsmidt.flightsim;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Model {
-    private int calculationValue;
+    List<Aircraft> aircraftList;
 
-    public void addTwoNumbers(int firstNumber, int secondNumber){
-        calculationValue = firstNumber + secondNumber;
+    public Model() {
+        this.aircraftList = new ArrayList<>();
     }
 
-    public int getCalculationValue(){
-        return calculationValue;
+    public void update() {
+
     }
 }

@@ -1,57 +1,65 @@
-package com.axelsmidt.flightsim.view;
+package com.axelsmidt.flightsim;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.Timer;
 
-public class View extends JFrame {
-    private JTextField firstNumber  = new JTextField(10);
-    private JLabel additionLabel = new JLabel("+");
-    private JTextField secondNumber = new JTextField(10);
-    private JButton calculateButton = new JButton("Calculate");
-    private JTextField calcSolution = new JTextField(10);
+public class View extends JPanel implements ActionListener {
+    private Timer timer;
+    private Model model;
 
-    public View(){
-        // Sets up the view and adds the components
-        JPanel calcPanel = new JPanel();
-
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(600, 200);
-
-        calcPanel.add(firstNumber);
-        calcPanel.add(additionLabel);
-        calcPanel.add(secondNumber);
-        calcPanel.add(calculateButton);
-        calcPanel.add(calcSolution);
-
-        this.add(calcPanel);
-
-        // End of setting up the components --------
+    public View() {
+        this.model = new Model();
+        this.timer = new Timer(0, this);
+        this.timer.start();
+        this.setBackground(Color.BLACK);
     }
 
-    public int getFirstNumber(){
-        return Integer.parseInt(firstNumber.getText());
+    public void drawGrid(Graphics g, int interval) {
+        g.setColor(new Color(30, 30, 30));
+
+        int screenWidth = this.getWidth();
+        int screenHeight = this.getHeight();
+
+        // Drawing a vertical line for every "interval" degrees of longitude
+        int lonLineInterval = screenWidth / (360 / interval);
+
+        // Drawing a horizontal line for every "interval" degrees of latitude
+        int latLineInterval = screenHeight / (180 / interval);
+
+        // Drawing longitudinal lines, western hemisphere
+        for (int i = (screenWidth / 2); i > 0; i = i - lonLineInterval) {
+            g.drawLine(i, 0, i, screenHeight);
+        }
+
+        // Drawing longitudinal lines, eastern hemisphere
+        for (int i = ((screenWidth / 2) + lonLineInterval); i < screenWidth; i = i + lonLineInterval) {
+            g.drawLine(i, 0, i, screenHeight);
+        }
+
+        // Drawing latitudinal lines, northern hemisphere
+        for (int i = (screenHeight / 2); i > 0; i = i - latLineInterval) {
+            g.drawLine(0, i, screenWidth, i);
+        }
+
+        // Drawing latitudinal lines, southern hemisphere
+        for (int i = ((screenHeight / 2) + latLineInterval); i < screenHeight; i = i + latLineInterval) {
+            g.drawLine(0, i, screenWidth, i);
+        }
     }
 
-    public int getSecondNumber(){
-        return Integer.parseInt(secondNumber.getText());
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        this.drawGrid(g, 15);
     }
 
-    public int getCalcSolution(){
-        return Integer.parseInt(calcSolution.getText());
-    }
-
-    public void setCalcSolution(int solution){
-        calcSolution.setText(Integer.toString(solution));
-    }
-
-    // If the calculateButton is clicked execute a method
-    // in the Controller named actionPerformed
-    void addCalculateListener(ActionListener listenForCalcButton){
-        calculateButton.addActionListener(listenForCalcButton);
-    }
-
-    // Open a popup that contains the error message passed
-    void displayErrorMessage(String errorMessage){
-        JOptionPane.showMessageDialog(this, errorMessage);
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        model.update();
+        this.repaint();
     }
 }
